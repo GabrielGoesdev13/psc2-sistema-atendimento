@@ -129,6 +129,27 @@ struct ListaMedicos {
     }
 };
 
+void imprimirHistorico(PilhaHistorico& hist) {
+    cout << "\n=== Relatório de Atendimentos ===\n";
+    if (hist.isEmpty()) {
+        cout << "(nenhum atendimento registrado)\n";
+        return;
+    }
+
+    PilhaHistorico aux;
+    int posicao = 1;
+
+    while (!hist.isEmpty()) {
+        string atendimento = hist.pop();
+        cout << "  " << posicao++ << ". " << atendimento << "\n";
+        aux.push(atendimento);
+    }
+
+    while (!aux.isEmpty()) {
+        hist.push(aux.pop());
+    }
+}
+
 int main() {
     cout << "╔═══════════════════════════════════════════════════╗\n";
     cout << "║  Sistema de Atendimento — Squad ________________  ║\n";
@@ -167,6 +188,13 @@ int main() {
     }
 
     cout << "\nÚltimo atendimento registrado (peek): " << historico.peek() << "\n";
+
+    imprimirHistorico(historico);
+
+    cout << "\n💡 Lembrete de commits:\n";
+    cout << "  git add atendimento.cpp README.md\n";
+    cout << "  git commit -m \"feat: sistema de atendimento integrado (R1-R4)\"\n";
+    cout << "  git push origin main\n";
 
     return 0;
 }
