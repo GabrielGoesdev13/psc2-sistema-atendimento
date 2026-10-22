@@ -82,10 +82,68 @@ struct PilhaHistorico {
     }
 };
 
+struct ListaMedicos {
+    No* head = nullptr;
+
+    void adicionarMedico(const string& nome) {
+        No* novo = new No(nome);
+        if (head == nullptr) {
+            head = novo;
+            return;
+        }
+        No* p = head;
+        while (p->prox != nullptr) p = p->prox;
+        p->prox = novo;
+    }
+
+    string chamarMedico() {
+        if (head == nullptr) return "";
+        No* removido = head;
+        string nome  = removido->nome;
+        head = head->prox;
+        delete removido;
+        return nome;
+    }
+
+    void percorrer(const string& prefixo = "") const {
+        if (!prefixo.empty()) cout << prefixo << ": ";
+        if (head == nullptr) {
+            cout << "(lista vazia)\n";
+            return;
+        }
+        for (No* p = head; p != nullptr; p = p->prox) {
+            cout << p->nome;
+            if (p->prox != nullptr) cout << " -> ";
+        }
+        cout << "\n";
+    }
+
+    bool temMedico() const { return head != nullptr; }
+
+    ~ListaMedicos() {
+        while (head) {
+            No* t = head;
+            head  = head->prox;
+            delete t;
+        }
+    }
+};
+
 int main() {
+    cout << "╔═══════════════════════════════════════════════════╗\n";
+    cout << "║  Sistema de Atendimento — Squad ________________  ║\n";
+    cout << "╚═══════════════════════════════════════════════════╝\n\n";
+
     FilaPacientes  fila;
     PilhaHistorico historico;
+    ListaMedicos   medicos;
 
+    medicos.adicionarMedico("Dra. Ana Lima");
+    medicos.adicionarMedico("Dr. Bruno Costa");
+    medicos.adicionarMedico("Dra. Carla Ramos");
+    medicos.percorrer("Médicos disponíveis");
+
+    cout << "\nPacientes chegando:\n";
     fila.enqueue("Eduardo (urgencia=3)", 3);
     fila.enqueue("Fernanda (urgencia=1)", 1);
     fila.enqueue("Gabriel (urgencia=2)", 2);
@@ -94,11 +152,18 @@ int main() {
     cout << "Próximo a ser atendido: " << fila.frente_peek() << "\n";
     cout << "Total na fila: " << fila.tamanho() << "\n";
 
-    cout << "\nAtendendo pacientes:\n";
-    while (!fila.isEmpty()) {
+    cout << "\nSimulação de atendimentos:\n";
+    int atend = 1;
+    while (!fila.isEmpty() && medicos.temMedico()) {
         string paciente = fila.dequeue();
-        cout << "  " << paciente << "\n";
-        historico.push(paciente);
+        string medico   = medicos.chamarMedico();
+
+        cout << "  [" << atend++ << "] " << medico
+             << " atende " << paciente << "\n";
+
+        historico.push(medico + " → " + paciente);
+
+        medicos.adicionarMedico(medico);
     }
 
     cout << "\nÚltimo atendimento registrado (peek): " << historico.peek() << "\n";
