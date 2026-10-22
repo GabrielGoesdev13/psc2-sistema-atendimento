@@ -52,8 +52,39 @@ struct FilaPacientes {
     }
 };
 
+struct PilhaHistorico {
+    No* topo = nullptr;
+
+    void push(const string& nome) {
+        No* novo  = new No(nome);
+        novo->prox = topo;
+        topo       = novo;
+    }
+
+    string pop() {
+        if (isEmpty()) return "";
+        No* removido = topo;
+        string nome  = removido->nome;
+        topo = topo->prox;
+        delete removido;
+        return nome;
+    }
+
+    string peek() const {
+        if (isEmpty()) return "";
+        return topo->nome;
+    }
+
+    bool isEmpty() const { return topo == nullptr; }
+
+    ~PilhaHistorico() {
+        while (!isEmpty()) pop();
+    }
+};
+
 int main() {
-    FilaPacientes fila;
+    FilaPacientes  fila;
+    PilhaHistorico historico;
 
     fila.enqueue("Eduardo (urgencia=3)", 3);
     fila.enqueue("Fernanda (urgencia=1)", 1);
@@ -65,8 +96,12 @@ int main() {
 
     cout << "\nAtendendo pacientes:\n";
     while (!fila.isEmpty()) {
-        cout << "  " << fila.dequeue() << "\n";
+        string paciente = fila.dequeue();
+        cout << "  " << paciente << "\n";
+        historico.push(paciente);
     }
+
+    cout << "\nÚltimo atendimento registrado (peek): " << historico.peek() << "\n";
 
     return 0;
 }
